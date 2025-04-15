@@ -108,14 +108,16 @@ def main():
     model.train()
 
     # start training loop here
-    for it in trange(cur_iter, config.max_iter):
+    pbar = trange(cur_iter, config.max_iter)
+    for it in pbar:
         optimizer.zero_grad()
         data = train_loader.get()
         data = {k: v.to(device) for k, v in data.items()}
         # calls model.forward here
         loss, result_dict = model(**data)
         loss.backward()
-        print("loss", loss.item())
+        # print("loss", loss.item())
+        pbar.set_postfix({"loss": loss.item()})
         optimizer.step()
         scheduler.step()
 
