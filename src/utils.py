@@ -81,7 +81,20 @@ def transform_grasp_pose(
     Grasp
         The transformed grasp in the robot frame.
     """
-    raise NotImplementedError
+    # 物体在相机坐标系下的位置
+    obj_pos = grasp.trans.reshape(3, 1)
+    cam_pos = est_rot @ obj_pos + est_trans.reshape(3, 1)
+    robot_pos = cam_rot @ cam_pos + cam_trans.reshape(3, 1)
+    
+    # 转换旋转矩阵
+    robot_rot = cam_rot @ est_rot @ grasp.rot
+
+    return Grasp(
+        trans=robot_pos.flatten(),
+        rot=robot_rot,
+        width=grasp.width,
+    )
+    # raise NotImplementedError
 
 def get_pc(depth: np.ndarray, intrinsics: np.ndarray) -> np.ndarray:
     """
